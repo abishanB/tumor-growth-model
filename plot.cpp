@@ -12,7 +12,6 @@ int main() {
         y.push_back(i * i * i);  
     }
 
-    // Plot
     plt::plot(x, y);
     plt::xlabel("x");
     plt::ylabel("y = x^2");
