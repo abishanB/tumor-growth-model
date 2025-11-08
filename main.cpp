@@ -5,10 +5,10 @@
 
 namespace plt = matplotlibcpp;
 
-const double k_g = 0.2;       // Tumor growth rate constant
+const double k_g = 0.1;       // Tumor growth rate constant
 const double T_max = 1.0;     // Carrying capacity
-const double k_d = 0.1;       // Drug kill coefficient
-const double d = 0.05;        // Clearance rate of dead cells
+const double k_d = 0.4;       // Drug kill coefficient
+const double d = 0.1;        // Clearance rate of dead cells
 
 
 struct State {
@@ -56,7 +56,7 @@ int main() {
     double t0 = 0.0, t_end = 50.0, dt = 0.1;
 
     State y;
-    y.S = 0.8;  // initial viable cells
+    y.S = 30;  // initial viable cells
     y.D = 0.0;  // initial dead cells
 
     std::vector<double> time_values, S_values, D_values, T_values;
@@ -71,10 +71,10 @@ int main() {
         y = rk4_step(t, dt, y);
     }
 
-    
+
     plt::figure_size(800, 600);
-    plt::plot(time_values, S_values, {{"label", "S (viable cells)"}});
-    plt::plot(time_values, D_values, {{"label", "D (damaged cells)"}});
+    //plt::plot(time_values, S_values, {{"label", "S (viable cells)"}});
+    //plt::plot(time_values, D_values, {{"label", "D (damaged cells)"}});
     plt::plot(time_values, T_values, {{"label", "T (total tumor size)"}});
 
     plt::xlabel("Time");
