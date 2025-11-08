@@ -7,7 +7,7 @@ namespace plt = matplotlibcpp;
 
 const double k_g = 0.1;       // Tumor growth rate constant
 const double T_max = 1.0;     // Carrying capacity
-const double k_d = 0.4;       // Drug kill coefficient
+const double k_d = 0.04;       // Drug kill coefficient
 const double d = 0.1;        // Clearance rate of dead cells
 
 
@@ -16,15 +16,13 @@ struct State {
     double D;
 };
 
-
-// Exposure function 
 double Exposure(double t) {
-    return 1.0; // constant exposure
+    return 30.0 * pow(t, 0.5) / (pow(100.0, 0.5) + pow(t, 0.5));
 }
 
-// Logistic growth function
-double f(double T) {
-    return k_g * T * (1.0 - T / T_max);
+double f(double S) {
+    return k_g * S;//exponential growth function
+    //return k_g * T * (1.0 - T / T_max); //Logistic growth function
 }
 
 // ODEs
@@ -34,7 +32,7 @@ State derivatives(double t, const State &y) {
     double exp = Exposure(t);
 
     State dydt;
-    dydt.S = f(S + D) - k_d * exp * S;
+    dydt.S = f(S) - k_d * exp * S;
     dydt.D = k_d * exp * S - d * D;
     return dydt;
 }
