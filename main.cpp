@@ -6,7 +6,7 @@
 
 namespace plt = matplotlibcpp;
 
-// Model parameters
+// Model constants
 const double k_g = 0.10;   // Tumor growth rate constant
 const double k_d = 0.04;   // drug kill coefficient
 const double d   = 0.10;   // dead-cell clearance rate
@@ -76,7 +76,7 @@ State rk4_step(double t, double dt, const State& y) {
 }
 
 int main() {
-    double t0 = 0.0, t_end = 100.0, dt = 0.1;
+    double t0 = 0.0, t_end = 80.0, dt = 0.1;
 
     // Initial conditions
     State y;
@@ -87,7 +87,7 @@ int main() {
     std::vector<double> time_values, S1_values, S2_values, D_values, T_values;
 
     for (double t = t0; t <= t_end; t += dt) {
-        double T = y.S1 + y.S2 ;
+        double T = y.S1 + y.S2;
 
         time_values.push_back(t);
         S1_values.push_back(y.S1);
@@ -101,17 +101,18 @@ int main() {
     // Plotting
     plt::figure_size(900, 600);
 
-    plt::plot(time_values, S1_values, {{"label", "S1 (proliferating tumor)"}});
-    plt::plot(time_values, S2_values, {{"label", "S2 (transit compartment)"}});
-    plt::plot(time_values, D_values,  {{"label", "D (dead cells)"}});
-    plt::plot(time_values, T_values,  {{"label", "T = S1 + S2"}});
-
+    plt::plot(time_values, S1_values, {{"label", "S1 (Viable Cells)"}, { "color", "green"}});
+    plt::plot(time_values, S2_values, {{"label", "S2 (Affected Cells)"}, { "color", "orange"}});
+    plt::plot(time_values, D_values,  {{"label", "D (Dying/Dead Cells)"}, { "color", "red"}});
+    plt::plot(time_values, T_values,  {{"label", "T = S1 + S2"}, { "color", "blue"}});
+    
     plt::xlabel("Time");
     plt::ylabel("Tumor Burden");
-    plt::title("Tumor Growth Model with Delayed Drug Kill");
+    plt::title("Tumor Growth Model with Drug Response");
     plt::legend();
     plt::grid(true);
+    
     plt::show();
-
+    
     return 0;
 }

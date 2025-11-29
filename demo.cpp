@@ -7,7 +7,6 @@
 namespace plt = matplotlibcpp;
 
 const double k_g = 0.1;    // Tumor growth rate constant
-const double T_max = 1.0;  // Carrying capacity
 const double k_d = 0.04;   // Drug kill coefficient
 const double d = 0.1;      // Clearance rate of dead cells
 
