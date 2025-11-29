@@ -6,82 +6,112 @@
 
 namespace plt = matplotlibcpp;
 
-const double k_g = 0.1;    // Tumor growth rate constant
-const double T_max = 1.0;  // Carrying capacity
-const double k_d = 0.04;   // Drug kill coefficient
-const double d = 0.1;      // Clearance rate of dead cells
+// Model parameters
+const double k_g = 0.10;   // Tumor growth rate constant
+const double k_d = 0.04;   // drug kill coefficient
+const double d   = 0.10;   // dead-cell clearance rate
 
-struct State {
-  double S;
-  double D;
-};
-
+// Exposure function using hills equation
 double Exposure(double t) {
-  return 30.0 * pow(t, 0.5) / (pow(100.0, 0.5) + pow(t, 0.5));
+    return 30.0 * std::pow(t, 0.5) /
+           (std::pow(100.0, 0.5) + std::pow(t, 0.5));
 }
 
-double calculateGrowth(double S) {
-  return k_g * S;  // exponential growth function
-  // return k_g * T * (1.0 - T / T_max); //Logistic growth function
+struct State {
+    double S1;
+    double S2;
+    double D;
+};
+
+// Exponential growth
+double growth(double S1) {
+    return k_g * S1;
 }
 
 // ODEs
 State derivatives(double t, const State& y) {
-  double S = y.S;
-  double D = y.D;
-  double exp = Exposure(t);
+    double S1 = y.S1;
+    double S2 = y.S2;
+    double D  = y.D;
+    double exp = Exposure(t);
 
-  State dydt;
-  dydt.S = calculateGrowth(S) - k_d * exp * S;
-  dydt.D = k_d * exp * S - d * D;
-  return dydt;
+    State dydt;
+    dydt.S1 = growth(S1) - k_d * exp * S1;
+
+    dydt.S2 = k_d * exp * S1 - k_d * S2;
+
+    dydt.D  = k_d * S2 - d * D;
+
+    return dydt;
 }
 
-// runge kutta
+// Runge-Kutta 4th order step
 State rk4_step(double t, double dt, const State& y) {
-  State k1 = derivatives(t, y);
-  State k2 =
-      derivatives(t + dt / 2.0, {y.S + dt * k1.S / 2.0, y.D + dt * k1.D / 2.0});
-  State k3 =
-      derivatives(t + dt / 2.0, {y.S + dt * k2.S / 2.0, y.D + dt * k2.D / 2.0});
-  State k4 = derivatives(t + dt, {y.S + dt * k3.S, y.D + dt * k3.D});
+    State k1 = derivatives(t, y);
 
-  State y_next;
-  y_next.S = y.S + (dt / 6.0) * (k1.S + 2 * k2.S + 2 * k3.S + k4.S);
-  y_next.D = y.D + (dt / 6.0) * (k1.D + 2 * k2.D + 2 * k3.D + k4.D);
-  return y_next;
+    State k2 = derivatives(t + dt/2.0, {
+        y.S1 + dt * k1.S1 / 2.0,
+        y.S2 + dt * k1.S2 / 2.0,
+        y.D  + dt * k1.D  / 2.0
+    });
+
+    State k3 = derivatives(t + dt/2.0, {
+        y.S1 + dt * k2.S1 / 2.0,
+        y.S2 + dt * k2.S2 / 2.0,
+        y.D  + dt * k2.D  / 2.0
+    });
+
+    State k4 = derivatives(t + dt, {
+        y.S1 + dt * k3.S1,
+        y.S2 + dt * k3.S2,
+        y.D  + dt * k3.D
+    });
+
+    State next;
+    next.S1 = y.S1 + (dt/6.0) * (k1.S1 + 2*k2.S1 + 2*k3.S1 + k4.S1);
+    next.S2 = y.S2 + (dt/6.0) * (k1.S2 + 2*k2.S2 + 2*k3.S2 + k4.S2);
+    next.D  = y.D  + (dt/6.0) * (k1.D  + 2*k2.D  + 2*k3.D  + k4.D );
+
+    return next;
 }
 
 int main() {
-  double t0 = 0.0, t_end = 50.0, dt = 0.1;
+    double t0 = 0.0, t_end = 100.0, dt = 0.1;
 
-  State y;
-  y.S = 30;   // initial viable cells
-  y.D = 0.0;  // initial dead cells
+    // Initial conditions
+    State y;
+    y.S1 = 30.0;
+    y.S2 = 0.0;
+    y.D  = 0.0;
 
-  std::vector<double> time_values, S_values, D_values, T_values;
+    std::vector<double> time_values, S1_values, S2_values, D_values, T_values;
 
-  for (double t = t0; t <= t_end; t += dt) {
-    double T = y.S + y.D;
-    time_values.push_back(t);
-    S_values.push_back(y.S);
-    D_values.push_back(y.D);
-    T_values.push_back(T);
+    for (double t = t0; t <= t_end; t += dt) {
+        double T = y.S1 + y.S2 ;
 
-    y = rk4_step(t, dt, y);
-  }
+        time_values.push_back(t);
+        S1_values.push_back(y.S1);
+        S2_values.push_back(y.S2);
+        D_values.push_back(y.D);
+        T_values.push_back(T);
 
-  plt::figure_size(800, 600);
-  plt::plot(time_values, S_values, {{"label", "S (viable cells)"}});
-  plt::plot(time_values, D_values, {{"label", "D (damaged cells)"}});
-  plt::plot(time_values, T_values, {{"label", "T (total tumor size)"}});
+        y = rk4_step(t, dt, y);
+    }
 
-  plt::xlabel("Time");
-  plt::ylabel("Cell Population");
-  plt::title("Tumor Growth and Drug Response Model");
-  plt::legend();
-  plt::grid(true);
-  plt::show();
+    // Plotting
+    plt::figure_size(900, 600);
 
-  return 0;
+    plt::plot(time_values, S1_values, {{"label", "S1 (proliferating tumor)"}});
+    plt::plot(time_values, S2_values, {{"label", "S2 (transit compartment)"}});
+    plt::plot(time_values, D_values,  {{"label", "D (dead cells)"}});
+    plt::plot(time_values, T_values,  {{"label", "T = S1 + S2"}});
+
+    plt::xlabel("Time");
+    plt::ylabel("Tumor Burden");
+    plt::title("Tumor Growth Model with Delayed Drug Kill");
+    plt::legend();
+    plt::grid(true);
+    plt::show();
+
+    return 0;
 }
