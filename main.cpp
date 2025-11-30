@@ -11,16 +11,16 @@ const double k_g = 0.1;   // Tumor growth rate constant
 const double k_d = 0.04;   // drug kill coefficient
 const double d   = 0.10;   // dead-cell clearance rate
 const double e_max = 30.0; // maximum exposure level
-
-const bool simulaute_treatment_end = true;
+const double T_max = 120.0; // carrying capacity
+const bool simulaute_treatment_end = false;
 const double treatment_end_time = 30.0;
 
 // Exposure function 
 double exposure(double t) {
+    return 0.0;
     if (simulaute_treatment_end && t >= treatment_end_time){
         return 0.0;
     }
-
     //hills equation
     return e_max * std::pow(t, 0.5) /
            (std::pow(100.0, 0.5) + std::pow(t, 0.5));
@@ -32,8 +32,11 @@ struct State {
     double D;
 };
 
+double logisticGrowth(double S1) {
+    return k_g * S1 * (1.0 - S1 / T_max);
+}
 // Exponential growth
-double growth(double S1) {
+double exponentialGrowth(double S1) {
     return k_g * S1;
 }
 
@@ -45,7 +48,8 @@ State derivatives(double t, const State& y) {
     double exp = exposure(t);
 
     State dydt;
-    dydt.S1 = growth(S1) - k_d * exp * S1;
+    //dydt.S1 = logisticGrowth(S1) - k_d * exp * S1;
+    dydt.S1 = logisticGrowth(S1) - k_d * exp * S1;
 
     dydt.S2 = k_d * exp * S1 - k_d * S2;
 
