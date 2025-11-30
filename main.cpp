@@ -7,13 +7,22 @@
 namespace plt = matplotlibcpp;
 
 // Model constants
-const double k_g = 0.10;   // Tumor growth rate constant
+const double k_g = 0.1;   // Tumor growth rate constant
 const double k_d = 0.04;   // drug kill coefficient
 const double d   = 0.10;   // dead-cell clearance rate
+const double e_max = 30.0; // maximum exposure level
 
-// Exposure function using hills equation
-double Exposure(double t) {
-    return 30.0 * std::pow(t, 0.5) /
+const bool simulaute_treatment_end = true;
+const double treatment_end_time = 30.0;
+
+// Exposure function 
+double exposure(double t) {
+    if (simulaute_treatment_end && t >= treatment_end_time){
+        return 0.0;
+    }
+
+    //hills equation
+    return e_max * std::pow(t, 0.5) /
            (std::pow(100.0, 0.5) + std::pow(t, 0.5));
 }
 
@@ -33,7 +42,7 @@ State derivatives(double t, const State& y) {
     double S1 = y.S1;
     double S2 = y.S2;
     double D  = y.D;
-    double exp = Exposure(t);
+    double exp = exposure(t);
 
     State dydt;
     dydt.S1 = growth(S1) - k_d * exp * S1;
@@ -76,7 +85,7 @@ State rk4_step(double t, double dt, const State& y) {
 }
 
 int main() {
-    double t0 = 0.0, t_end = 80.0, dt = 0.1;
+    double t0 = 0.0, t_end = 100.0, dt = 0.1;
 
     // Initial conditions
     State y;
@@ -108,7 +117,7 @@ int main() {
     
     plt::xlabel("Time");
     plt::ylabel("Tumor Burden");
-    plt::title("Tumor Growth Model with Drug Response");
+    plt::title("Tumor Growth Model");
     plt::legend();
     plt::grid(true);
     
