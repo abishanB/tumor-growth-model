@@ -17,7 +17,6 @@ const double treatment_end_time = 30.0;
 
 // Exposure function 
 double exposure(double t) {
-    return 0.0;
     if (simulaute_treatment_end && t >= treatment_end_time){
         return 0.0;
     }
