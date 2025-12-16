@@ -1,6 +1,6 @@
 # Tumor Growth Model
 
-## Overview 📌
+## 📌 Overview
 This project implements a mathematical tumor growth and treatment response model using
 ordinary differential equations (ODEs). It simulates how tumor cells grow, respond to
 chemotherapy, and are cleared over time, following models commonly used in oncology
@@ -15,7 +15,7 @@ For the full system of ODE's and breakdown of the project, refer to [Report.pdf]
 
 ![](plots/main_plot.png)
 
-## Model Structure 🧬 
+## 🧬 Model Structure  
 The tumor is modeled as a three phase system:
 
 - S1 represents viable tumor cells that grow according to a chosen growth function.
@@ -30,7 +30,7 @@ T = S1 + S2
 Tumor growth can be modeled using either exponential growth or logistic growth with a
 carrying capacity to reflect biological limits. 
 
-## Drug Exposure 🧪
+## 🧪 Drug Exposure 
 Drug effect is modeled through a time dependent exposure term based on Hill’s equation.
 
 This allows simulation of realistic treatment dynamics, including increasing exposure
@@ -39,13 +39,13 @@ over time, constant exposure, or treatment cut off scenarios.
 Key parameters include the tumor growth rate, drug kill coefficient, maximum exposure,
 and dead cell clearance rate.
 
-## Numerical Method 🧮
+## 🧮 Numerical Method 
 The system of ODEs is solved using the fourth order Runge Kutta method.
 
 RK4 provides a stable and accurate approach for integrating nonlinear biological models
 while remaining computationally efficient.
 
-## Experiments & Plots 📊
+## 📊 Experiments & Plots 
 The model is evaluated under multiple conditions
 
 ### Tumor Growth Without Treatment
