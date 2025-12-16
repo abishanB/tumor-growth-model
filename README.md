@@ -11,7 +11,7 @@ Runge Kutta (RK4) method, with results visualized directly from C++ using the [m
 
 The main reference study for this project can be found [here](https://pmc.ncbi.nlm.nih.gov/articles/PMC6813171/).
 
-For the full system of ODE's and breakdown of the project, refer to Report.pdf
+For the full system of ODE's and breakdown of the project, refer to [Report.pdf](Report.pdf)
 
 ![](plots/main_plot.png)
 
@@ -57,3 +57,5 @@ The model is evaluated under multiple conditions
 ### Treatment Cut Off and Regrowth
 ![](plots/exposure_cutoff.png)
 
+## License
+This project is licensed under the MIT License.
